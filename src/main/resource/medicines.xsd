@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="https://www.epam.by/javaweb/evgeniyyaskecih/xmlwebparsing/medicines"
+        xmlns:tns="https://www.epam.by/javaweb/evgeniyyaskecih/xmlwebparsing/medicines"
+        elementFormDefault="qualified">
+
+    <element name="medicines">
+        <complexType>
+            <sequence>
+                <element name="medicine"
+                         type="tns:Medicine"
+                         maxOccurs="unbounded"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <complexType name="Medicine">
+        <sequence>
+            <element name="name" type="string"/>
+            <element name="producer" type="string"/>
+            <element name="group" type="tns:Group"/>
+            <element name="analogs" type="tns:Analogs"/>
+            <element name="versions" type="tns:Versions"/>
+        </sequence>
+    </complexType>
+
+    <simpleType name="Group">
+        <restriction base="string">
+            <enumeration value="Pain Reliever"/>
+            <enumeration value="Antibiotic"/>
+            <enumeration value="Antiseptic"/>
+            <enumeration value="Laxative"/>
+            <enumeration value="Sedative"/>
+            <enumeration value="Tranquilizer"/>
+            <enumeration value="Vitamins"/>
+            <enumeration value="Antiviral"/>
+            <enumeration value="Antifebrile"/>
+        </restriction>
+    </simpleType>
+
+    <complexType name="Analogs">
+        <sequence>
+            <element name="analog" type="tns:Analog" maxOccurs="unbounded"/>
+        </sequence>
+    </complexType>
+
+    <complexType name="Analog">
+        <simpleContent>
+            <extension base="string">
+                <attribute name="origin">
+                    <simpleType>
+                        <restriction base="string">
+                            <enumeration value="foreign"/>
+                            <enumeration value="local"/>
+                        </restriction>
+                    </simpleType>
+                </attribute>
+            </extension>
+        </simpleContent>
+    </complexType>
+
+    <complexType name="Versions">
+        <sequence>
+            <element name="version" maxOccurs="unbounded">
+                <complexType>
+                    <sequence>
+                        <element name="certificate" type="tns:Certificate"/>
+                        <element name="package" type="tns:Package"/>
+                        <element name="dosage" type="tns:Dosage"/>
+                    </sequence>
+                    <attribute name="consistency" type="tns:Consistency" use="required"/>
+                </complexType>
+            </element>
+        </sequence>
+    </complexType>
+
+    <simpleType name="Consistency">
+        <restriction base="string">
+            <enumeration value="pill"/>
+            <enumeration value="syrup"/>
+            <enumeration value="drops"/>
+            <enumeration value="ointment"/>
+            <enumeration value="capsule"/>
+        </restriction>
+    </simpleType>
+
+    <complexType name="Certificate">
+        <sequence>
+            <element name="issueDate" type="date"/>
+            <element name="expirationDate" type="date"/>
+            <element name="registeringOrganization" type="string"/>
+        </sequence>
+        <attribute name="id" type="ID" use="required"/>
+    </complexType>
+
+    <complexType name="Package">
+        <sequence>
+            <element name="amount" type="positiveInteger"/>
+            <element name="price" type="tns:Price"/>
+        </sequence>
+        <attribute name="type" default="box"/>
+    </complexType>
+
+    <simpleType name="Price">
+        <restriction base="decimal">
+            <minExclusive value="0"/>
+            <maxInclusive value="1000"/>
+        </restriction>
+    </simpleType>
+
+    <complexType name="Dosage">
+        <sequence>
+            <element name="dose" type="tns:Dose"/>
+            <element name="periodicity" type="tns:Periodicity"/>
+        </sequence>
+    </complexType>
+
+    <simpleType name="Periodicity">
+        <restriction base="string">
+            <pattern value="\s*[1-9][0-9]*[\-]?\s*[0-9]*\s+(months?|weeks?|days?|hours?)\s*"/>
+            <whiteSpace value="replace"/>
+        </restriction>
+    </simpleType>
+
+    <simpleType name="Dose">
+        <restriction base="string">
+            <pattern value="\s*[1-9][0-9]*[\-]?\s*[0-9]*\s+(mg|ml|pieces|drops)\s*"/>
+        </restriction>
+    </simpleType>
+
+</schema>

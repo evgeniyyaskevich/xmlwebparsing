@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- TODO: add medicines(need sixteen medicines in xml file)
+     TODO: ID can start from letter? - Yes, type ID in xml-->
+<medicines xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns="https://www.epam.by/javaweb/evgeniyyaskecih/xmlwebparsing/medicines"
+           xsi:schemaLocation="https://www.epam.by/javaweb/evgeniyyaskecih/xmlwebparsing/medicines medicines.xsd">
+    <medicine>
+        <name>Aspirin</name>
+        <producer>Bayer Company</producer>
+        <group>Pain Reliever</group>
+        <analogs>
+            <analog origin="foreign">Epicor</analog>
+            <analog origin="local">Aspicard</analog>
+            <analog>Kardiomagnyl</analog>
+        </analogs>
+        <versions>
+            <version consistency="pill">
+                <certificate id="ID-28012019228">
+                    <issueDate>2019-01-28</issueDate>
+                    <expirationDate>2020-12-31</expirationDate>
+                    <registeringOrganization>Official Bayer Protection Company</registeringOrganization>
+                </certificate>
+                <package>
+                    <amount>20</amount>
+                    <price>25.3</price>
+                </package>
+                <dosage>
+                    <dose>81 mg</dose>
+                    <periodicity>3-5 days</periodicity>
+                </dosage>
+            </version>
+        </versions>
+    </medicine>
+
+    <medicine>
+        <name>Corvalolum</name>
+        <producer>LekPharm</producer>
+        <group>Sedative</group>
+        <analogs>
+            <analog origin="local">Corvaldin</analog>
+            <analog origin="local">Barboval</analog>
+        </analogs>
+        <versions>
+            <version consistency="drops">
+                <certificate id="ID-28012019230">
+                    <issueDate>2013-11-13</issueDate>
+                    <expirationDate>2020-12-31</expirationDate>
+                    <registeringOrganization>Ukrainian Pharmacy Administration</registeringOrganization>
+                </certificate>
+                <package type="bottle">
+                    <amount>50</amount>
+                    <price>3.35</price>
+                </package>
+                <dosage>
+                    <dose>7-10 drops</dose>
+                    <periodicity>1 day</periodicity>
+                </dosage>
+            </version>
+        </versions>
+    </medicine>
+
+    <medicine>
+        <name>Groprinosin</name>
+        <producer>Gedeon Richter</producer>
+        <group>Antiviral</group>
+        <analogs>
+            <analog origin="local">Anapheron</analog>
+            <analog origin="foreign">Arbidol</analog>
+        </analogs>
+        <versions>
+            <version consistency="pill">
+                <certificate id="ID-28012019232">
+                    <issueDate>2000-01-13</issueDate>
+                    <expirationDate>2020-12-21</expirationDate>
+                    <registeringOrganization>Sun Pharmaceutical Industries</registeringOrganization>
+                </certificate>
+                <package>
+                    <amount>50</amount>
+                    <price>13</price>
+                </package>
+                <dosage>
+                    <dose>500 mg</dose>
+                    <periodicity>5-7 days</periodicity>
+                </dosage>
+            </version>
+
+            <version consistency="syrup">
+                <certificate id="ID-28012019233">
+                    <issueDate>2014-05-13</issueDate>
+                    <expirationDate>2020-12-21</expirationDate>
+                    <registeringOrganization>Sun Pharmaceutical Industries</registeringOrganization>
+                </certificate>
+                <package type="bottle">
+                    <amount>250</amount>
+                    <price>10</price>
+                </package>
+                <dosage>
+                    <dose>10 ml</dose>
+                    <periodicity>5-7 days</periodicity>
+                </dosage>
+            </version>
+        </versions>
+    </medicine>
+
+</medicines>

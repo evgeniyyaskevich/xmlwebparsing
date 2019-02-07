@@ -1,0 +1,3 @@
+consistency - pill(tablet), capsule,
+group - pain reliever, antibiotic, antiseptic, Laxative, Tranquilizer, Vitamin Pills, Antifebrile,
+package type - box, tube,
