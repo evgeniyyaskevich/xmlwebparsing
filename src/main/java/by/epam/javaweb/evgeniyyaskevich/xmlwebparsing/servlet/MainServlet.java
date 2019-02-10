@@ -1,6 +1,8 @@
 package by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.servlet;
 
 import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.entity.Medicine;
+import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.exceptions.InvalidInputStreamException;
+import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.exceptions.InvalidParserNameException;
 import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.factory.XmlParserFactory;
 import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.parser.XmlParser;
 import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.validator.XmlValidator;
@@ -8,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.xml.sax.SAXException;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -22,18 +23,29 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+//TODO: check choosing file by user
+//TODO: validation
+//TODO: test
+//TODO: logs!
 @WebServlet("/parsing")
 @MultipartConfig
 public class MainServlet extends HttpServlet {
+    private static final long serialVersionUID = -2250669219016950199L;
+    private static final Logger LOGGER = LogManager.getLogger(MainServlet.class);
+    private final String INVALID_FILE_ERROR_PAGE = "/WEB-INF/jsp/errors/invalidFileError.jsp";
+    private final String MEDICINE_TABLE_PAGE = "/WEB-INF/jsp/medicineTable.jsp";
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         Part filePart = request.getPart("inputFile");
 
-        try (InputStream xmlStream = filePart.getInputStream()) {
+        try (InputStream xmlStreamForValidation = filePart.getInputStream()) {
             XmlValidator validator = XmlValidator.getInstance();
-            if (!validator.validate(new StreamSource(xmlStream), "medicines.xsd")) {
-                //TODO: redirect to error page
+            if (!validator.validate(new StreamSource(xmlStreamForValidation), "medicines.xsd")) {
+                LOGGER.warn("File isn`t valid.");
+                getServletContext().getRequestDispatcher(INVALID_FILE_ERROR_PAGE)
+                        .forward(request, response);
                 return;
             }
             XmlParser<Medicine> medicineParser;
@@ -41,24 +53,21 @@ public class MainServlet extends HttpServlet {
             XmlParserFactory parserFactory = XmlParserFactory.getInstance();
             medicineParser = parserFactory.createMedicineParser(parserName);
 
-            final Logger LOGGER = LogManager.getLogger(MainServlet.class);
-            LOGGER.error("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            LOGGER.info("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            LOGGER.trace("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            LOGGER.debug("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            LOGGER.warn("AWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
-            LOGGER.fatal("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-            InputStream xmlStream1 = filePart.getInputStream();
-            List<Medicine> medicines = medicineParser.parse(xmlStream1);
+            InputStream xmlStreamForParsing = filePart.getInputStream();
+            List<Medicine> medicines = medicineParser.parse(xmlStreamForParsing);
 
             request.setAttribute("medicines", medicines);
-            //request.setAttribute("parser", parserName);
-
-            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/WEB-INF/jsp/medicineTable.jsp");
-            dispatcher.forward(request, response);
-        } catch (ParserConfigurationException | SAXException e) {
+            getServletContext().getRequestDispatcher(MEDICINE_TABLE_PAGE)
+                    .forward(request, response);
+        } catch (InvalidInputStreamException e) {
+            LOGGER.warn("Invalid input stream " + e.getMessage());
             e.printStackTrace();
-            //TODO: log this event!!!
+            getServletContext().getRequestDispatcher(INVALID_FILE_ERROR_PAGE)
+                    .forward(request, response);
+        } catch (InvalidParserNameException | ParserConfigurationException | SAXException e) {
+            LOGGER.error(e.getMessage());
+            e.printStackTrace();
+            response.sendError(500);
         }
     }
 }

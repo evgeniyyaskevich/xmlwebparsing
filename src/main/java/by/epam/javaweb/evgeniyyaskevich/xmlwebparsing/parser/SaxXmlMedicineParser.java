@@ -1,10 +1,10 @@
 package by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.parser;
 
-import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.builder.CertificateBuilder;
-import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.builder.MedicineBuilder;
-import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.builder.PackBuilder;
-import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.builder.VersionBuilder;
+import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.builder.*;
 import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.entity.*;
+import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.exceptions.InvalidInputStreamException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -19,41 +19,40 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SaxXmlMedicineParser extends DefaultHandler implements XmlParser<Medicine> {
+    private static final Logger LOGGER = LogManager.getLogger(SaxXmlMedicineParser.class);
 
     private List<Medicine> medicines;
     private MedicineBuilder medicineBuilder;
     private PackBuilder packBuilder;
     private CertificateBuilder certificateBuilder;
     private VersionBuilder versionBuilder;
+    private AnalogBuilder analogBuilder;
+    private DosageBuilder dosageBuilder;
     private String currentElement;
-    //TODO: QUESTION: I haven`t builder for this classes because of a little amount of parameters in constructor
-    //TODO: but here builder is very convenient, set in object isn`t good?
-    private Analog analog;
-    private Dosage dosage;
 
     @Override
-    public void startDocument() throws SAXException {
-        //TODO: Log parse starting...
+    public void startDocument() {
+        LOGGER.debug("SAX parsing started.");
         medicines = new ArrayList<>();
     }
 
     @Override
-    public void endDocument() throws SAXException {
-        super.endDocument();
+    public void endDocument() {
+        LOGGER.debug("SAX parsing ended.");
     }
 
     @Override
-    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+    public void startElement(String uri, String localName, String qName, Attributes attributes) {
         currentElement = qName;
         switch (currentElement) {
             case "medicine":
                 medicineBuilder = new MedicineBuilder();
                 break;
             case "analog":
-                analog = new Analog();
+                analogBuilder = new AnalogBuilder();
                 String origin = attributes.getValue("origin");
                 origin = (origin == null) ? "unspecified" : origin;
-                analog.setOrigin(Origin.valueByString(origin));
+                analogBuilder.setOrigin(Origin.valueByString(origin));
                 break;
             case "version":
                 versionBuilder = new VersionBuilder();
@@ -72,15 +71,13 @@ public class SaxXmlMedicineParser extends DefaultHandler implements XmlParser<Me
                 packBuilder.setPackType(PackType.valueByString(packType));
                 break;
             case "dosage":
-                dosage = new Dosage();
+                dosageBuilder = new DosageBuilder();
                 break;
-            default:
-                //TODO: Log this event!!!
         }
     }
 
     @Override
-    public void endElement(String uri, String localName, String qName) throws SAXException {
+    public void endElement(String uri, String localName, String qName) {
         switch (qName) {
             case "version":
                 medicineBuilder.addVersion(versionBuilder.build());
@@ -92,21 +89,19 @@ public class SaxXmlMedicineParser extends DefaultHandler implements XmlParser<Me
                 versionBuilder.setPack(packBuilder.build());
                 break;
             case "analog":
-                medicineBuilder.addAnalog(analog);
+                medicineBuilder.addAnalog(analogBuilder.build());
                 break;
             case "dosage":
-                versionBuilder.setDosage(dosage);
+                versionBuilder.setDosage(dosageBuilder.build());
                 break;
             case "medicine":
                 medicines.add(medicineBuilder.build());
                 break;
-            default:
-                //TODO: log this event!!!
         }
     }
 
     @Override
-    public void characters(char[] ch, int start, int length) throws SAXException {
+    public void characters(char[] ch, int start, int length) {
         String info = new String(ch, start, length);
         info = info.replace("\n", "").trim();
         if (!info.isEmpty()) {
@@ -121,7 +116,7 @@ public class SaxXmlMedicineParser extends DefaultHandler implements XmlParser<Me
                     medicineBuilder.setGroup(Group.valueByString(info));
                     break;
                 case "analog":
-                    analog.setName(info);
+                    analogBuilder.setName(info);
                     break;
                 case "issueDate":
                     certificateBuilder.setIssueDate(LocalDate.parse(info));
@@ -139,22 +134,24 @@ public class SaxXmlMedicineParser extends DefaultHandler implements XmlParser<Me
                     packBuilder.setPrice(Double.parseDouble(info));
                     break;
                 case "dose":
-                    dosage.setDose(info);
+                    dosageBuilder.setDose(info);
                     break;
                 case "periodicity":
-                    dosage.setPeriodicity(info);
+                    dosageBuilder.setPeriodicity(info);
                     break;
-                default:
-                    //TODO: log this event!!!
-
             }
         }
     }
 
-    public List<Medicine> parse(InputStream xmlStream) throws IOException, SAXException, ParserConfigurationException {
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        SAXParser parser = factory.newSAXParser();
-        parser.parse(xmlStream, this);
-        return medicines;
+    public List<Medicine> parse(InputStream xmlStream) throws InvalidInputStreamException, SAXException, ParserConfigurationException {
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            SAXParser parser = factory.newSAXParser();
+            parser.parse(xmlStream, this);
+            return medicines;
+        } catch (IOException exception) {
+            LOGGER.error("Stream isn`t valid for parsing.");
+            throw new InvalidInputStreamException(exception);
+        }
     }
 }

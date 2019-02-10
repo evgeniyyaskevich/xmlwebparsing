@@ -7,7 +7,7 @@
         </File>
 
         <Console name="STDOUT" target="SYSTEM_OUT">
-            <PatternLayout pattern="%d{HH:mm:ss} - [%-5p] ------- %m%n"/>
+            <PatternLayout pattern="%d{HH:mm:ss} - [%-5p] - %m%n"/>
         </Console>
 
         <File name="DEBUGFILE" fileName="${log4j:configParentLocation}/logs/Debug.log">

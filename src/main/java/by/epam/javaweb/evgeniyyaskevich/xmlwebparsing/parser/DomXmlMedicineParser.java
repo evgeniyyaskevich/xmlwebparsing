@@ -2,6 +2,9 @@ package by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.parser;
 
 import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.builder.*;
 import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.entity.*;
+import by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.exceptions.InvalidInputStreamException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -17,27 +20,30 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO: check throws exception, may be catch, log and throw?
-
 public class DomXmlMedicineParser implements XmlParser<Medicine> {
+    private static final Logger LOGGER = LogManager.getLogger(DomXmlMedicineParser.class);
 
-    public List<Medicine> parse(InputStream xmlStream) throws ParserConfigurationException, SAXException, IOException {
+    public List<Medicine> parse(InputStream xmlStream) throws ParserConfigurationException, SAXException, InvalidInputStreamException {
         List<Medicine> medicines = new ArrayList<>();
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document document = builder.parse(xmlStream);
+            document.getDocumentElement().normalize();
 
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(xmlStream);
-        document.getDocumentElement().normalize();
+            NodeList medicineList = document.getElementsByTagName("medicine");
+            for (int i = 0; i < medicineList.getLength(); ++i) {
+                Node medicineNode = medicineList.item(i);
+                Element medicineElement = (Element) medicineNode;
 
-        NodeList medicineList = document.getElementsByTagName("medicine");
-        for (int i = 0; i < medicineList.getLength(); ++i) {
-            Node medicineNode = medicineList.item(i);
-            Element medicineElement = (Element) medicineNode;
-
-            Medicine medicine = buildMedicine(medicineElement);
-            medicines.add(medicine);
+                Medicine medicine = buildMedicine(medicineElement);
+                medicines.add(medicine);
+            }
+            return medicines;
+        } catch (IOException exception) {
+            LOGGER.error("Stream isn`t valid for parsing.");
+            throw new InvalidInputStreamException(exception);
         }
-        return medicines;
     }
 
     private Medicine buildMedicine(Element medicineElement) {
