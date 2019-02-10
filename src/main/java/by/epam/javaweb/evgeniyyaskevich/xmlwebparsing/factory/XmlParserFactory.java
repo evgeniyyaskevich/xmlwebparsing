@@ -25,7 +25,7 @@ public class XmlParserFactory {
     public XmlParser<Medicine> createMedicineParser(String parserName) throws InvalidParserNameException {
         parserName = parserName.toLowerCase();
         switch (parserName) {
-            case "sa":
+            case "sax":
                 return new SaxXmlMedicineParser();
             case "stax":
                 return new StaxXmlMedicineParser();

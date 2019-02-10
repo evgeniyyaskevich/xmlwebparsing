@@ -24,6 +24,7 @@ public class DomXmlMedicineParser implements XmlParser<Medicine> {
     private static final Logger LOGGER = LogManager.getLogger(DomXmlMedicineParser.class);
 
     public List<Medicine> parse(InputStream xmlStream) throws ParserConfigurationException, SAXException, InvalidInputStreamException {
+        LOGGER.debug("DOM parsing started.");
         List<Medicine> medicines = new ArrayList<>();
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -39,6 +40,7 @@ public class DomXmlMedicineParser implements XmlParser<Medicine> {
                 Medicine medicine = buildMedicine(medicineElement);
                 medicines.add(medicine);
             }
+            LOGGER.debug("DOM parsing ended.");
             return medicines;
         } catch (IOException exception) {
             LOGGER.error("Stream isn`t valid for parsing.");
@@ -133,6 +135,7 @@ public class DomXmlMedicineParser implements XmlParser<Medicine> {
         PackBuilder packBuilder = new PackBuilder();
 
         String packType = packElement.getAttribute("type");
+        packType = (packType.equals("")) ? "box" : packType;
         String amount = packElement.getElementsByTagName("amount").item(0).getTextContent();
         String price = packElement.getElementsByTagName("price").item(0).getTextContent();
         packBuilder.setAmount(Integer.parseInt(amount))

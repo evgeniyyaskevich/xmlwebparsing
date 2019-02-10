@@ -2,10 +2,12 @@ package by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.entity;
 
 public enum Consistency {
     PILL("pill"),
-    SYRuP("syrup"),
+    SYRUP("syrup"),
     DROPS("drops"),
     OINTMENT("ointment"),
     CAPSULE("capsule"),
+    POWDER("powder"),
+    TABLET("tablet"),
     UNKNOWN("unknown");
 
     private String name;

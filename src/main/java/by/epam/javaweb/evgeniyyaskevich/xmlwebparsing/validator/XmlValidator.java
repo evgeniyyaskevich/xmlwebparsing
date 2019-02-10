@@ -29,6 +29,7 @@ public class XmlValidator {
 
     public boolean validate(StreamSource xmlSource, String schemeName) throws InvalidInputStreamException {
         try {
+            LOGGER.debug("Validation starts...");
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
             ClassLoader classLoader = XmlValidator.class.getClassLoader();
             File schemaLocation =  new File(Objects.requireNonNull(classLoader.getResource(schemeName)).getFile());
@@ -37,10 +38,13 @@ public class XmlValidator {
             validator.validate(xmlSource);
             return true;
         } catch (SAXException e) {
+            LOGGER.warn(e.getMessage());
             return false;
         } catch (IOException exception) {
             LOGGER.error("Stream isn`t valid for scheme validation.");
             throw new InvalidInputStreamException(exception);
+        } finally {
+            LOGGER.debug("Validation ended.");
         }
     }
 }

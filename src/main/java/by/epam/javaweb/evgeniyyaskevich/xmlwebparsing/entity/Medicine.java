@@ -1,6 +1,7 @@
 package by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.entity;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Medicine {
     private String name;
@@ -47,5 +48,26 @@ public class Medicine {
 
     public void setProducer(String producer) {
         this.producer = producer;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Medicine medicine = (Medicine) o;
+        return name.equals(medicine.name) &&
+                group == medicine.group &&
+                producer.equals(medicine.producer) &&
+                analogs.equals(medicine.analogs) &&
+                versions.equals(medicine.versions);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, group, producer, analogs, versions);
     }
 }

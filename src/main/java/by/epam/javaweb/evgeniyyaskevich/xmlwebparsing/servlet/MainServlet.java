@@ -23,10 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-//TODO: check choosing file by user
-//TODO: validation
-//TODO: test
-//TODO: logs!
 @WebServlet("/parsing")
 @MultipartConfig
 public class MainServlet extends HttpServlet {
@@ -48,14 +44,16 @@ public class MainServlet extends HttpServlet {
                         .forward(request, response);
                 return;
             }
+
             XmlParser<Medicine> medicineParser;
             String parserName = request.getParameter("parser");
             XmlParserFactory parserFactory = XmlParserFactory.getInstance();
             medicineParser = parserFactory.createMedicineParser(parserName);
 
-            InputStream xmlStreamForParsing = filePart.getInputStream();
-            List<Medicine> medicines = medicineParser.parse(xmlStreamForParsing);
-
+            List<Medicine> medicines;
+            try (InputStream xmlStreamForParsing = filePart.getInputStream()) {
+                medicines = medicineParser.parse(xmlStreamForParsing);
+            }
             request.setAttribute("medicines", medicines);
             getServletContext().getRequestDispatcher(MEDICINE_TABLE_PAGE)
                     .forward(request, response);

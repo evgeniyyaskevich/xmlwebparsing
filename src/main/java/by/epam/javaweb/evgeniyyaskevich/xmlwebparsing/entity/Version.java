@@ -1,5 +1,7 @@
 package by.epam.javaweb.evgeniyyaskevich.xmlwebparsing.entity;
 
+import java.util.Objects;
+
 public class Version {
     private Consistency consistency;
     private Certificate certificate;
@@ -36,5 +38,25 @@ public class Version {
 
     public void setDosage(Dosage dosage) {
         this.dosage = dosage;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Version version = (Version) o;
+        return consistency == version.consistency &&
+                certificate.equals(version.certificate) &&
+                pack.equals(version.pack) &&
+                dosage.equals(version.dosage);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(consistency, certificate, pack, dosage);
     }
 }

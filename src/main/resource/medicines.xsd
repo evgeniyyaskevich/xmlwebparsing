@@ -81,6 +81,8 @@
             <enumeration value="drops"/>
             <enumeration value="ointment"/>
             <enumeration value="capsule"/>
+            <enumeration value="powder"/>
+            <enumeration value="tablet"/>
         </restriction>
     </simpleType>
 
@@ -124,7 +126,7 @@
 
     <simpleType name="Dose">
         <restriction base="string">
-            <pattern value="\s*[1-9][0-9]*[\-]?\s*[0-9]*\s+(mg|ml|pieces|drops)\s*"/>
+            <pattern value="\s*[1-9][0-9]*[\-]?\s*[0-9]*\s+(g|mg|ml|pieces|drops)\s*"/>
         </restriction>
     </simpleType>
 

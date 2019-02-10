@@ -48,7 +48,7 @@
 <body>
 <div class="error-container">
     <h1>Ooops...</h1>
-    <h2 class="not-found"> Your file isn`t valid. <br> Please fix and try again.</h2>
+    <h2 class="not-found"> Your file isn`t valid or not found. <br> Please fix and try again.</h2>
 </div>
 </body>
 </html>
